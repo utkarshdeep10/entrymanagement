@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="/stylesheets/index.css">
+    <title>Entry Management Application</title>
+</head>
+<body>
+    
+    <div class="ui raised container main text segment" id="main">
+        <form action="/checkedIn" method="POST" class="ui form">
+            
+            <div class="ui container head1">
+            <div class="ui header blue">Visitor Details</div>
+                <div class="field">
+                    <label>Name:</label>
+                    <input type="text" placeholder="Henry Morcelli" name="visitorname" required>
+                </div>
+                <div class="field">
+                        <label>Email:</label>
+                    <input type="text" placeholder="henry@gmail.com" name="visitoremail">
+                </div>
+                <div class="field">
+                    <label>Phone Number:</label>
+                    <input type="text" placeholder="9100012345" name="visitorphone" required>
+                </div>
+            </div>
+            <hr>
+            <div class="ui container head1">
+                <div class="ui header green">Host Details</div>
+                <div class="field">
+                    <label>Name:</label>
+                    <input type="text" placeholder="Charles Brown" name="hostname" required>
+                </div>
+                <div class="field">
+                        <label>Email:</label>
+                    <input type="text" placeholder="charles@gmail.com" name="hostemail" required>
+                </div>
+                <div class="field">
+                    <label>Phone Number:</label>
+                    <input type="text" placeholder="8230013465" name="hostphone" required>
+                </div>
+            </div>
+            <div class="ui container center aligned head1">
+                    <button class="ui red button" type="submit">Check-In</button>
+                    <button class="ui teal button" type="reset">Reset</button>
+            </div>
+            
+            </form>
+    </div>
+</body>
+</html>
