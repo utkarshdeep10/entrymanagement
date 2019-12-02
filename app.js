@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const nodemailer = require('nodemailer');
 const smtpTransport = require('nodemailer-smtp-transport');
+const Nexmo = require("nexmo");
 
 const app = express();
 
@@ -21,6 +22,13 @@ const User = mongoose.model("User", userSchema);
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
+
+const nexmo = new Nexmo({
+	apiKey: 'efa994a1',
+	apiSecret: 'nswxsREgCe741xP1'
+}, {
+	debug: true
+})
 
 mongoose.connect('mongodb://localhost/userData3', {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
 mongoose.set('useFindAndModify', false);
@@ -50,6 +58,19 @@ app.post('/checkedIn', (req, res) => {
         <li>Phone: ${req.body.visitorphone}</li>
         </ul>`;
 
+    const smsOutput = "The details of your reservation are : - \n" +
+					"Name : " + req.body.visitorname + "\n" +
+					"Email : " + req.body.visitoremail + "\n" +
+					"Phone : " + req.body.visitorphone;
+    
+    nexmo.message.sendSms("NEXMO", req.body.hostphone, smsOutput, {type: 'unicode'}, (err, response) => {
+        if(err) console.log(err)
+		else{
+			console.log("Message sent")
+			console.log(response);
+		}
+	});
+
     let transporter = nodemailer.createTransport(smtpTransport({
         service: 'gmail',
         host: 'smtp.gmail.com',
@@ -57,7 +78,7 @@ app.post('/checkedIn', (req, res) => {
           user: 'entrymanagementapp@gmail.com',
           pass: 'pAssWord3'
         }
-      }));
+    }));
 
   // setup email data with unicode symbols
     let mailOptions = {
