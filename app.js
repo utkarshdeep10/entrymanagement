@@ -1,3 +1,4 @@
+// Including packages and libraries
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -7,6 +8,7 @@ const Nexmo = require("nexmo");
 
 const app = express();
 
+// User Schema Model
 const userSchema = new mongoose.Schema({
     visitorname: String,
     visitoremail: String,
@@ -17,26 +19,29 @@ const userSchema = new mongoose.Schema({
     checkIn: String,
     checkOut: String
 });
-
 const User = mongoose.model("User", userSchema);
+
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
+// Mongoose Connect
+mongoose.connect('mongodb://localhost/entryManagementData', {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
+mongoose.set('useFindAndModify', false);
+
+// Initializing NEXMO for sms
 const nexmo = new Nexmo({
-	apiKey: 'efa994a1',
-	apiSecret: 'nswxsREgCe741xP1'
+	apiKey: 'YOUR_API_KEY',
+	apiSecret: 'YOUR_API_SECRET'
 }, {
 	debug: true
 })
-
-mongoose.connect('mongodb://localhost/userData3', {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
-mongoose.set('useFindAndModify', false);
 
 app.get('/', (req, res) => {
     res.render('main.ejs');
 });
 
+// POST Request when user checks in
 app.post('/checkedIn', (req, res) => {
     User.create({
        visitorname: req.body.visitorname,
@@ -49,15 +54,6 @@ app.post('/checkedIn', (req, res) => {
        checkOut: ''
     });
     
-    const output = `
-        <p>You have got a new visitor.</p>
-        <h3>Visitor Details: </h3>
-        <ul>  
-        <li>Name: ${req.body.visitorname}</li>
-        <li>Email: ${req.body.visitoremail}</li>
-        <li>Phone: ${req.body.visitorphone}</li>
-        </ul>`;
-
     const smsOutput = "The details of your reservation are : - \n" +
 					"Name : " + req.body.visitorname + "\n" +
 					"Email : " + req.body.visitoremail + "\n" +
@@ -69,20 +65,29 @@ app.post('/checkedIn', (req, res) => {
 			console.log("Message sent")
 			console.log(response);
 		}
-	});
+    });
+    
+    const output = `
+        <p>You have got a new visitor.</p>
+        <h3>Visitor Details: </h3>
+        <ul>  
+        <li>Name: ${req.body.visitorname}</li>
+        <li>Email: ${req.body.visitoremail}</li>
+        <li>Phone: ${req.body.visitorphone}</li>
+        </ul>`;
 
     let transporter = nodemailer.createTransport(smtpTransport({
         service: 'gmail',
         host: 'smtp.gmail.com',
         auth: {
-          user: 'entrymanagementapp@gmail.com',
-          pass: 'pAssWord3'
+          user: 'YOUR_GMAIL_ADDRESS',
+          pass: 'YOUR_PASSWORD'
         }
     }));
 
   // setup email data with unicode symbols
     let mailOptions = {
-      from: '"Entry Management App" entrymanagementapp@gmail.com', // sender address
+      from: '"Entry Management App" YOUR_GMAIL_ADDRESS', // sender address
       to: JSON.stringify(req.body.hostemail), // list of receivers
       subject: 'New Visitor Update', // Subject line
       html: output // html body
@@ -107,7 +112,11 @@ app.get('/checkedIn', (req, res) => {
 });
 
 app.post("/checkOut/:id/", (req,res) => {
+    
+    // Checkout Time Entry Update when user checks out
     User.findByIdAndUpdate(req.params.id, {checkOut: new Date().toLocaleTimeString() + ' , ' + new Date().toDateString()}, () => {});
+    
+    // Sending mail to visitor after checkout
     User.findOne({_id: req.params.id}, (err, data) => {
         const output = `
         <p>Thank You for visiting us</p>
@@ -124,14 +133,14 @@ app.post("/checkOut/:id/", (req,res) => {
         service: 'gmail',
         host: 'smtp.gmail.com',
         auth: {
-          user: 'entrymanagementapp@gmail.com',
-          pass: 'pAssWord3'
+          user: 'YOUR_GMAIL_ADDRESS',
+          pass: 'YOUR_PASSWORD'
         }
       }));
 
   // setup email data with unicode symbols
     let mailOptions = {
-      from: '"Entry Management App" entrymanagementapp@gmail.com', // sender address
+      from: '"Entry Management App" YOUR_GMAIL_ADDRESS', // sender address
       to: data.visitoremail, // list of receivers
       subject: 'Your Visit Details', // Subject line
       html: output // html body
